@@ -1,0 +1,29 @@
+#!/bin/bash
+
+#PBS -A allocation_number
+#PBS -q standard
+#PBS -l walltime=20:00:00
+#PBS -l select=1:ncpus=12:mpiprocs=4:ngpus=2
+#PBS -j oe
+#PBS -m e
+#PBS -M email@email.com
+
+source ~/.bashrc
+
+cd $CODE
+
+module load singularity
+module load cuda11.3/toolkit/11.3.0
+
+singularity exec --nv $STATICS/pytorch_v4.sif python train.py \
+    --path '' \
+    --name $NAME1 \
+    --dataset 'cifar10' \
+    --seed '$SEED1'  &
+singularity exec --nv $STATICS/pytorch.sif python train.py \
+    --path '' \
+    --name $NAME2 \
+    --dataset 'cifar10' \
+    --seed '$SEED2'  &
+wait
+
